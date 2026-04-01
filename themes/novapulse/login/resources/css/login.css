@@ -1,0 +1,379 @@
+/* ============================================================
+   NovaPulse Custom Keycloak Login Theme
+   Design: Deep-space dark palette · Purple/Cyan accent gradient
+   Font: Inter (Google Fonts)
+   ============================================================ */
+
+/* ── Reset & base ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep:       #07091a;
+  --bg-card:       #111527;
+  --bg-card-hover: #161a30;
+  --border:        rgba(108, 99, 255, 0.25);
+  --accent-start:  #6c63ff;
+  --accent-end:    #00d4ff;
+  --accent-grad:   linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  --text-primary:  #e8ecf8;
+  --text-muted:    #7a82a6;
+  --text-error:    #ff5f6d;
+  --input-bg:      #0d1025;
+  --input-border:  rgba(108, 99, 255, 0.3);
+  --input-focus:   #6c63ff;
+  --radius-sm:     8px;
+  --radius-md:     14px;
+  --radius-lg:     22px;
+  --shadow-card:   0 24px 64px rgba(0, 0, 0, 0.55),
+                   0 0 0 1px rgba(108, 99, 255, 0.12);
+  --shadow-btn:    0 8px 24px rgba(108, 99, 255, 0.4);
+  --transition:    0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--bg-deep);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Animated background ─────────────────────────────────── */
+.np-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Starfield layers */
+.np-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 35%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 70%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 68% 45%, rgba(255,255,255,0.6) 0%, transparent 100%);
+}
+.np-stars--sm { animation: drift-sm 90s linear infinite; opacity: 0.6; }
+.np-stars--md { animation: drift-md 70s linear infinite; opacity: 0.4; }
+.np-stars--lg { animation: drift-lg 50s linear infinite; opacity: 0.3; }
+
+@keyframes drift-sm { from { transform: translateY(0); }   to { transform: translateY(-40px); } }
+@keyframes drift-md { from { transform: translateY(0); }   to { transform: translateY(-25px); } }
+@keyframes drift-lg { from { transform: translateY(0); }   to { transform: translateY(-15px); } }
+
+/* Aurora glow */
+.np-aurora {
+  position: absolute;
+  width: 70vw;
+  height: 40vw;
+  top: -10%;
+  left: 15%;
+  background: radial-gradient(ellipse at center,
+    rgba(108, 99, 255, 0.18) 0%,
+    rgba(0, 212, 255, 0.10) 50%,
+    transparent 80%);
+  filter: blur(60px);
+  animation: aurora-pulse 8s ease-in-out infinite alternate;
+}
+@keyframes aurora-pulse {
+  from { opacity: 0.7; transform: scale(1);   }
+  to   { opacity: 1;   transform: scale(1.05); }
+}
+
+/* ── Layout ───────────────────────────────────────────────── */
+.np-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.np-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 40px 36px 34px;
+  animation: card-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  backdrop-filter: blur(12px);
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.np-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.np-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(0,212,255,0.15));
+  border: 1px solid rgba(108,99,255,0.35);
+  border-radius: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 0 28px rgba(108, 99, 255, 0.25);
+}
+.np-logo { display: block; }
+.np-brand {
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: var(--accent-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.4px;
+}
+.np-tagline {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── Alert ────────────────────────────────────────────────── */
+.np-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  font-size: 0.875rem;
+  animation: alert-in 0.3s ease both;
+}
+@keyframes alert-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+.np-alert--error   { background: rgba(255,95,109,0.12); border: 1px solid rgba(255,95,109,0.3);  color: #ff8a93; }
+.np-alert--warning { background: rgba(255,193,7,0.10);  border: 1px solid rgba(255,193,7,0.3);   color: #ffd54f; }
+.np-alert--success { background: rgba(0,212,100,0.10);  border: 1px solid rgba(0,212,100,0.3);   color: #4cde8a; }
+.np-alert__icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.np-alert__text { line-height: 1.45; }
+
+/* ── Form ─────────────────────────────────────────────────── */
+.np-form { display: flex; flex-direction: column; gap: 18px; }
+
+.np-field { display: flex; flex-direction: column; gap: 7px; }
+
+.np-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+/* Input wrapper: icon + input + optional toggle button */
+.np-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.np-input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+  display: flex;
+  transition: color var(--transition);
+}
+
+.np-input {
+  width: 100%;
+  padding: 11px 14px 11px 42px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.np-input::placeholder { color: #3d4568; }
+.np-input:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.18);
+}
+.np-input:focus + .np-input-icon,
+.np-input-wrap:focus-within .np-input-icon { color: var(--accent-start); }
+
+/* Password show/hide toggle */
+.np-toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color var(--transition);
+}
+.np-toggle-password:hover { color: var(--accent-start); }
+
+/* ── Options row (remember me + forgot) ──────────────────── */
+.np-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -4px;
+}
+
+/* Custom checkbox */
+.np-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.np-checkbox { display: none; }
+.np-checkmark {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--input-border);
+  border-radius: 4px;
+  background: var(--input-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), border-color var(--transition);
+}
+.np-checkbox:checked + .np-checkmark {
+  background: var(--accent-grad);
+  border-color: var(--accent-start);
+}
+.np-checkbox:checked + .np-checkmark::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 7px;
+  border: 1.5px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.np-link {
+  font-size: 0.8125rem;
+  color: var(--accent-start);
+  text-decoration: none;
+  transition: color var(--transition), opacity var(--transition);
+}
+.np-link:hover { color: var(--accent-end); opacity: 0.9; }
+
+/* ── Submit button ────────────────────────────────────────── */
+.np-btn--primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--accent-grad);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+  margin-top: 4px;
+}
+.np-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(108, 99, 255, 0.55);
+  filter: brightness(1.08);
+}
+.np-btn--primary:active  { transform: translateY(0); filter: brightness(0.95); }
+.np-btn__arrow { font-size: 1.1rem; transition: transform var(--transition); }
+.np-btn--primary:hover .np-btn__arrow { transform: translateX(4px); }
+
+/* ── Register text ────────────────────────────────────────── */
+.np-register-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 20px;
+}
+
+/* ── Divider ──────────────────────────────────────────────── */
+.np-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 14px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.np-divider::before, .np-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Social buttons ───────────────────────────────────────── */
+.np-social-list { display: flex; flex-direction: column; gap: 10px; }
+.np-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+}
+.np-social-btn:hover {
+  border-color: var(--accent-start);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.np-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 460px) {
+  .np-card { padding: 28px 20px 24px; }
+  .np-brand { font-size: 1.35rem; }
+}

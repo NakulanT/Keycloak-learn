@@ -1,0 +1,15 @@
+FROM quay.io/keycloak/keycloak:24.0.5
+
+# Copy SPI JAR
+COPY target/novapulse-authenticator.jar /opt/keycloak/providers/
+
+# Copy custom theme
+COPY src/main/resources/theme/novapulse /opt/keycloak/themes/novapulse
+
+# Optional: disable cache for dev (themes update instantly)
+ENV KC_SPI_THEME_STATIC_MAX_AGE=-1
+ENV KC_SPI_THEME_CACHE_THEMES=false
+ENV KC_SPI_THEME_CACHE_TEMPLATES=false
+
+# Build Keycloak with providers
+RUN /opt/keycloak/bin/kc.sh build

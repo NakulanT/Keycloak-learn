@@ -1,0 +1,23 @@
+# Keycloak distribution folders
+bin/
+lib/
+data/
+# Log files
+logs/
+*.log
+# IDE folders
+.idea/
+.vscode/
+.DS_Store
+# Maven/Java build artifacts
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+# Python
+__pycache__/
+*.py[cod]
+# OS specific
+Thumbs.db

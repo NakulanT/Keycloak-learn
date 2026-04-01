@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  keycloak:
+    build: .
+    container_name: novapulse-keycloak
+
+    command: start-dev
+
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      KC_DB: dev-file
+
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+
+      KC_LOG_LEVEL: INFO
+      KC_LOG_CONSOLE_COLOR: "true"
+
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9000:9000"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/health/ready || exit 1"]
+      interval: 20s
+      timeout: 8s
+      retries: 5
+      start_period: 40s
+
+    restart: unless-stopped
