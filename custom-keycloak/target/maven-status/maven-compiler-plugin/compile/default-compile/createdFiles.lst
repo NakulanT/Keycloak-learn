@@ -1,0 +1,5 @@
+com/novapulse/keycloak/auth/CustomUsernamePasswordAuthenticator.class
+com/novapulse/keycloak/auth/EmailOtpService.class
+com/novapulse/keycloak/auth/CustomUsernamePasswordAuthenticatorFactory.class
+com/novapulse/keycloak/auth/EmailOtpService$ValidationResult.class
+com/novapulse/keycloak/auth/CustomUsernamePasswordAuthenticator$1.class
