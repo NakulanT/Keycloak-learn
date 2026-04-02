@@ -35,7 +35,10 @@ buildNumber.properties
 
 # Keycloak Specific
 data/
-bin/history.txt
+bin/
+conf/
+lib/
+providers/
 logs/
 *.log
 
