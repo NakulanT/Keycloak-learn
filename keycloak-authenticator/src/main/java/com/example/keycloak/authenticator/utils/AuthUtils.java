@@ -43,7 +43,7 @@ public final class AuthUtils {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private EmailOtpService() {
+    private AuthUtils() {
         /* utility class */ }
 
     // ─────────────────────────────────────────────────────────────────────────

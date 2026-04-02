@@ -196,6 +196,3 @@ Custom-Keycloak/
 
 ---
 
-## License
-
-MIT — feel free to adapt for your own brand.
