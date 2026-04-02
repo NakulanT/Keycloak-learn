@@ -1,4 +1,5 @@
 package com.novapulse.keycloak.auth;
+import com.novapulse.keycloak.auth.utils.EmailOtpService;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;

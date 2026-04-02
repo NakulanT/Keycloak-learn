@@ -1,4 +1,4 @@
-package com.novapulse.keycloak.auth;
+package com.novapulse.keycloak.auth.utils;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
