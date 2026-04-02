@@ -1,1 +1,2 @@
-com.example.keycloak.authenticator.MyAuthenticatorFactory
+com.example.keycloak.authenticator.UsernamePasswordAuthenticatorFactory
+com.example.keycloak.authenticator.EmailOtpAuthenticatorFactory

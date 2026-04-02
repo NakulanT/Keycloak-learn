@@ -27,9 +27,9 @@ import java.util.Map;
  * <li>{@value #NOTE_OTP_EXPIRY} — epoch-second expiry timestamp</li>
  * </ul>
  */
-public final class AuthUtils {
+public final class OtpUtils {
 
-    private static final Logger LOG = Logger.getLogger(AuthUtils.class);
+    private static final Logger LOG = Logger.getLogger(OtpUtils.class);
 
     // ── Auth-session note keys ────────────────────────────────────────────────
     static final String NOTE_OTP_VALUE = "novapulse_otp_value";
@@ -43,7 +43,7 @@ public final class AuthUtils {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private AuthUtils() {
+    private OtpUtils() {
         /* utility class */ }
 
     // ─────────────────────────────────────────────────────────────────────────

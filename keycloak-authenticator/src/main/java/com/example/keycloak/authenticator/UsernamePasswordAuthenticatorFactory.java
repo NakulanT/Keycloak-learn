@@ -11,26 +11,19 @@ import org.keycloak.provider.ProviderConfigProperty;
 import java.util.List;
 
 /**
- * Factory that registers {@link MyAuthenticator} with
- * Keycloak.
+ * Factory that registers {@link UsernamePasswordAuthenticator} with Keycloak.
  *
  * <p>
- * The provider implements a single-step, two-stage flow:
- * <ol>
- * <li>Username + password validation.</li>
- * <li>Email OTP challenge (sent automatically after a valid password).</li>
- * </ol>
+ * Provider ID: {@value #PROVIDER_ID}
+ * <br>
+ * Place this as the <strong>first REQUIRED step</strong> of your flow, followed
+ * by {@link EmailOtpAuthenticatorFactory}.
  */
-public class MyAuthenticatorFactory implements AuthenticatorFactory {
+public class UsernamePasswordAuthenticatorFactory implements AuthenticatorFactory {
 
-    public static final String PROVIDER_ID = "novapulse-username-password-otp";
+    public static final String PROVIDER_ID = "novapulse-username-password";
 
-    // Configurable OTP TTL so admins can override the default without a
-    // code change. The value is read at runtime in AuthUtils if you
-    // wire it through (see note in getConfigProperties).
-    public static final String CFG_OTP_TTL = "otpTtlSeconds";
-
-    private static final MyAuthenticator SINGLETON = new MyAuthenticator();
+    private static final UsernamePasswordAuthenticator SINGLETON = new UsernamePasswordAuthenticator();
 
     private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED,
@@ -49,13 +42,13 @@ public class MyAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getDisplayType() {
-        return "NovaPulse: Username + Password + Email OTP";
+        return "NovaPulse: Username + Password (1FA)";
     }
 
     @Override
     public String getHelpText() {
-        return "Two-stage authenticator: validates username/password, then sends a "
-                + "6-digit OTP to the user's registered email address and verifies it. "
+        return "Validates username and password. On success, generates a 6-digit OTP, "
+                + "emails it to the user, and advances to the next step (Email OTP 2FA). "
                 + "Includes brute-force awareness, blank-field guards, and audit logging.";
     }
 
@@ -66,19 +59,12 @@ public class MyAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public boolean isConfigurable() {
-        // Expose OTP TTL as an admin-configurable property
-        return true;
+        return false;
     }
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        ProviderConfigProperty otpTtl = new ProviderConfigProperty(
-                CFG_OTP_TTL,
-                "OTP validity (seconds)",
-                "How long the emailed OTP remains valid. Default: 300 (5 minutes).",
-                ProviderConfigProperty.STRING_TYPE,
-                "300");
-        return List.of(otpTtl);
+        return List.of();
     }
 
     @Override
