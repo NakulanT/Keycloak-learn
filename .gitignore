@@ -1,14 +1,15 @@
 # Java
 *.class
-*.jar
 *.war
 *.ear
 *.zip
 *.tar.gz
 *.rar
+*.log
 
 # Maven
-target/
+**/target/*
+!**/target/*.jar
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -40,7 +41,6 @@ conf/
 lib/
 providers/
 logs/
-*.log
 
 # System Files
 .DS_Store
