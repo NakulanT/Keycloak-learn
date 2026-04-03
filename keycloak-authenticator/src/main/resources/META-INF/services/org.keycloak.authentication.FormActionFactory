@@ -1,0 +1,2 @@
+com.example.keycloak.authenticator.RegistrationOtpActionFactory
+com.example.keycloak.authenticator.RegistrationTacActionFactory

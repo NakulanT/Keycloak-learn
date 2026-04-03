@@ -10,7 +10,10 @@ import org.keycloak.models.UserModel;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Stateless helper for generating, storing, and validating email OTPs.
@@ -105,6 +108,51 @@ public final class OtpUtils {
     }
 
     /**
+     * Sends an OTP email to a raw email address (used during registration
+     * before the user model exists). Wraps the address in a minimal
+     * {@link UserModel} adapter so we can reuse {@link EmailSenderProvider}.
+     */
+    public static void sendRegistrationOtpEmail(KeycloakSession session,
+            RealmModel realm,
+            String toEmail,
+            String otp) {
+        String realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
+        long ttlMinutes = OTP_TTL_SECONDS / 60;
+
+        String subject = "[" + realmName + "] Verify your email to complete registration";
+
+        String textBody = realmName + " — Email verification code\n"
+                + "=========================================\n\n"
+                + "Your registration verification code is:\n\n"
+                + "  " + otp + "\n\n"
+                + "This code expires in " + ttlMinutes + " minutes.\n\n"
+                + "If you did not request this code, please ignore this email.\n\n"
+                + "--\n"
+                + realmName + " — automated security message";
+
+        String htmlBody = "<!DOCTYPE html><html><body style=\"font-family:Arial,sans-serif;\">"
+                + "<h2>" + realmName + " — Email verification code</h2>"
+                + "<p>Your registration verification code is:</p>"
+                + "<h1 style=\"letter-spacing:6px;color:#1a73e8;\">" + otp + "</h1>"
+                + "<p>This code expires in <strong>" + ttlMinutes + " minutes</strong>.</p>"
+                + "<hr/>"
+                + "<p style=\"color:#888;font-size:12px;\">If you did not register for an account, "
+                + "please ignore this email.</p>"
+                + "</body></html>";
+
+        try {
+            UserModel recipient = new SimpleEmailUser(toEmail);
+            Map<String, String> smtpConfig = realm.getSmtpConfig();
+            session.getProvider(EmailSenderProvider.class)
+                    .send(smtpConfig, recipient, subject, textBody, htmlBody);
+            LOG.infof("[NovaPulse OTP] Registration OTP email dispatched to %s", toEmail);
+        } catch (EmailException e) {
+            LOG.errorf(e, "[NovaPulse OTP] Failed to send registration OTP email to %s", toEmail);
+            throw new RuntimeException("Failed to send registration OTP email", e);
+        }
+    }
+
+    /**
      * Sends the OTP to the user's email via Keycloak's {@link EmailSenderProvider},
      * using inline HTML and plain-text bodies (no .ftl template files required).
      */
@@ -163,6 +211,196 @@ public final class OtpUtils {
     private static void clearOtpNotes(AuthenticationFlowContext context) {
         context.getAuthenticationSession().removeAuthNote(NOTE_OTP_VALUE);
         context.getAuthenticationSession().removeAuthNote(NOTE_OTP_EXPIRY);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Minimal UserModel adapter — used only for sending emails to an address
+    // that doesn't yet have a persisted user (e.g. during registration).
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private static final class SimpleEmailUser implements UserModel {
+        private final String email;
+
+        SimpleEmailUser(String email) {
+            this.email = email;
+        }
+
+        @Override
+        public String getEmail() {
+            return email;
+        }
+
+        @Override
+        public String getFirstName() {
+            return "";
+        }
+
+        @Override
+        public String getLastName() {
+            return "";
+        }
+
+        @Override
+        public String getId() {
+            return null;
+        }
+
+        @Override
+        public String getUsername() {
+            return email;
+        }
+
+        @Override
+        public void setUsername(String username) {
+        }
+
+        @Override
+        public Long getCreatedTimestamp() {
+            return null;
+        }
+
+        @Override
+        public void setCreatedTimestamp(Long timestamp) {
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        @Override
+        public void setEnabled(boolean enabled) {
+        }
+
+        @Override
+        public void setSingleAttribute(String name, String value) {
+        }
+
+        @Override
+        public void setAttribute(String name, List<String> values) {
+        }
+
+        @Override
+        public void removeAttribute(String name) {
+        }
+
+        @Override
+        public String getFirstAttribute(String name) {
+            return null;
+        }
+
+        @Override
+        public Stream<String> getAttributeStream(String name) {
+            return Stream.empty();
+        }
+
+        @Override
+        public Map<String, List<String>> getAttributes() {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public Stream<String> getRequiredActionsStream() {
+            return Stream.empty();
+        }
+
+        @Override
+        public void addRequiredAction(String action) {
+        }
+
+        @Override
+        public void removeRequiredAction(String action) {
+        }
+
+        @Override
+        public void setFirstName(String firstName) {
+        }
+
+        @Override
+        public void setLastName(String lastName) {
+        }
+
+        @Override
+        public boolean isEmailVerified() {
+            return true;
+        }
+
+        @Override
+        public void setEmailVerified(boolean verified) {
+        }
+
+        @Override
+        public void setEmail(String email) {
+        }
+
+        @Override
+        public Stream<org.keycloak.models.GroupModel> getGroupsStream() {
+            return Stream.empty();
+        }
+
+        @Override
+        public void joinGroup(org.keycloak.models.GroupModel group) {
+        }
+
+        @Override
+        public void leaveGroup(org.keycloak.models.GroupModel group) {
+        }
+
+        @Override
+        public boolean isMemberOf(org.keycloak.models.GroupModel group) {
+            return false;
+        }
+
+        @Override
+        public String getFederationLink() {
+            return null;
+        }
+
+        @Override
+        public void setFederationLink(String link) {
+        }
+
+        @Override
+        public String getServiceAccountClientLink() {
+            return null;
+        }
+
+        @Override
+        public void setServiceAccountClientLink(String clientInternalId) {
+        }
+
+        @Override
+        public org.keycloak.models.SubjectCredentialManager credentialManager() {
+            return null;
+        }
+
+        @Override
+        public Stream<org.keycloak.models.RoleModel> getRealmRoleMappingsStream() {
+            return Stream.empty();
+        }
+
+        @Override
+        public Stream<org.keycloak.models.RoleModel> getClientRoleMappingsStream(org.keycloak.models.ClientModel app) {
+            return Stream.empty();
+        }
+
+        @Override
+        public boolean hasRole(org.keycloak.models.RoleModel role) {
+            return false;
+        }
+
+        @Override
+        public void grantRole(org.keycloak.models.RoleModel role) {
+        }
+
+        @Override
+        public Stream<org.keycloak.models.RoleModel> getRoleMappingsStream() {
+            return Stream.empty();
+        }
+
+        @Override
+        public void deleteRoleMapping(org.keycloak.models.RoleModel role) {
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────

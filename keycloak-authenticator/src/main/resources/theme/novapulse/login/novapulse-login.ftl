@@ -168,7 +168,7 @@
         <p class="np-register-text">
             Don't have an account?
             <a href="${url.registrationUrl}" class="np-link" id="kc-register-link">
-                Create one
+                Register
             </a>
         </p>
         </#if>
